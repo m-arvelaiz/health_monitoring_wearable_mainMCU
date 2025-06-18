@@ -24,7 +24,7 @@ static uint8_t rx_buffer[UART_RX_BUFFER_SIZE];
 
 // Forward declarations
 static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size);
-static void uart_handler_Send_Response(uint8_t status, uint8_t* payload, uint8_t payload_len, uint32_t timestamp);
+static void uart_handler_Send_Response(uint8_t status, uint8_t* payload, uint8_t payload_len);
 
 static uint8_t Calculate_CRC(const uint8_t *data, uint8_t length) {
     uint8_t crc = 0;

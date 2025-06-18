@@ -7,8 +7,11 @@
 
 #ifndef INC_DATA_HANDLER_H_
 #define INC_DATA_HANDLER_H_
+#include <stdint.h>
+#include "uart_handler.h"
 
 
+#define DATA_HANDLER_PAYLOAD_LENGHT 10
 typedef enum {
     CMD_REQ_HR_SPO2_DATA      = 0x01, // HR & SpO2 + timestamp
     CMD_REQ_TEMP_DATA         = 0x02, // Temperature + timestamp
