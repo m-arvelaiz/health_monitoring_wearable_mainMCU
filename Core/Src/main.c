@@ -21,7 +21,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "uart_handler.h"
+#include "data_handler.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,6 +106,8 @@ int main(void)
   MX_UART4_Init();
   MX_ICACHE_Init();
   /* USER CODE BEGIN 2 */
+  uart_handler_Init(&huart4);
+  data_handler_Init();
 
   /* USER CODE END 2 */
 
