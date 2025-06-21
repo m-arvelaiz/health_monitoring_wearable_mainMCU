@@ -29,6 +29,9 @@ typedef enum {
 typedef struct Data_Handler {
     Data_CmdID_t data_cmd;
     uint8_t* payload;
+    uint8_t* payload_out;
+    uint8_t lenght;
+    uint8_t lenght_out;
 } Data_Handler_t;
 
 // Lifecycle
