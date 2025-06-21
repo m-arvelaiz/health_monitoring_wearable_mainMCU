@@ -12,7 +12,13 @@
 #include <stdbool.h>
 
 
-#define TEMP_SENSOR_ADDRESS 0
+
+#define TEMP_SENSOR_HTS221_WHO_AM_I_REG   0x0F
+#define TEMP_SENSOR_HTS221_WHO_AM_I_VAL   0xBC
+#define TEMP_SENSOR_HTS221_CTRL_REG1      0x20
+#define TEMP_SENSOR_HTS221_CTRL_REG2      0x21
+#define TEMP_SENSOR_HTS221_STATUS_REG     0x27
+
 #define TEMP_HUMIDITY_SENSOR_HISTORY_SIZE 10
 
 // Sensor-specific data type
@@ -34,8 +40,9 @@ typedef struct Temp_Sensor {
     Temp_Data_t* (*get_last_data)();
     Temp_Data_t** (*get_last_n_data)(uint8_t n);
     uint8_t (*get_last_n_data_serial_format)(uint8_t n, uint8_t* out_buffer);
-    void (*prepare_i2c_request)(uint8_t* payload_out);  // Prepares I2C payload
+//    void (*prepare_i2c_request)(uint8_t* payload_out, uint8_t* lenght);  // Prepares I2C payload
     void (*decode_i2c_response)(uint8_t* data, uint8_t len); // Parses I2C rx data
+    bool (*trigger_data_collection)();
 } Temp_Sensor_t;
 
 // Initialize and release lifecycle
