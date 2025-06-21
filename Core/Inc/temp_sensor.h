@@ -31,6 +31,9 @@ typedef struct Temp_Sensor {
 
     // Function pointers for custom handling
     void (*format_uart_response)(uint8_t* payload_out); // Local function in .c
+    Temp_Data_t* (*get_last_data)();
+    Temp_Data_t** (*get_last_n_data)(uint8_t n);
+    uint8_t* (*get_last_n_data_serial_format)(uint8_t n, uint8_t* out_buffer);
     void (*prepare_i2c_request)(uint8_t* payload_out);  // Prepares I2C payload
     void (*decode_i2c_response)(uint8_t* data, uint8_t len); // Parses I2C rx data
 } Temp_Sensor_t;

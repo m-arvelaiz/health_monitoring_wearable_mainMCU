@@ -12,11 +12,17 @@
 #include <string.h>
 
 static Temp_Sensor_t* temp_sensor = NULL;
+static Temp_Data_t* temp_data_ptr_buffer[TEMP_HUMIDITY_SENSOR_HISTORY_SIZE];
 
 // === Local Function Prototypes ===
 static void temp_format_uart_response(uint8_t* payload_out);
+static Temp_Data_t* temp_sensor_get_last_temp_data();
+static Temp_Data_t** temp_sensor_get_last_n_data(uint8_t n);
+static uint8_t* temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out);
 static void temp_prepare_i2c_request(uint8_t* payload_out);
 static void temp_decode_i2c_response(uint8_t* data, uint8_t len);
+
+
 
 
 // === Public API ===
@@ -26,14 +32,22 @@ void temp_sensor_init(uint8_t address) {
     if (temp_sensor == NULL) {
         temp_sensor = (Temp_Sensor_t*) malloc(sizeof(Temp_Sensor_t));
     }
+
+    if (temp_sensor == NULL) {
+            temp_data = (Temp_Sensor_t*) malloc(sizeof(Temp_Sensor_t));
+    }
     memset(temp_sensor, 0, sizeof(Temp_Sensor_t));
 
-    temp_sensor->i2c_address = address;
-    temp_sensor->format_uart_response = temp_format_uart_response;
-    temp_sensor->prepare_i2c_request = temp_prepare_i2c_request;
-    temp_sensor->decode_i2c_response = temp_decode_i2c_response;
+	temp_sensor->i2c_address = address;
+	temp_sensor->format_uart_response = temp_format_uart_response;
+	temp_sensor->prepare_i2c_request = temp_prepare_i2c_request;
+	temp_sensor->decode_i2c_response = temp_decode_i2c_response;
+	temp_sensor->get_last_data = temp_sensor_get_last_temp_data;
+	temp_sensor->get_last_n_data = temp_sensor_get_last_n_data;
+	temp_sensor->get_last_n_data_serial_format = temp_sensor_get_last_n_temp_data_serial_format;
 
-    // TODO: Perform initial I2C check or sensor config if needed
+	memset(temp_data_ptr_buffer, 0, sizeof(temp_data_ptr_buffer));
+	// TODO: Perform initial I2C check or sensor config if needed
 }
 
 
@@ -43,7 +57,6 @@ void temp_sensor_deinit(void) {
         free(temp_sensor);
         temp_sensor = NULL;
     }
-    // TODO: Additional cleanup if needed
 }
 
 
@@ -70,6 +83,63 @@ static void temp_format_uart_response(uint8_t* payload_out) {
 
 }
 
+/**
+ * @brief Retrieve last Temp_Data_t pointer from history.
+ *
+ */
+
+Temp_Data_t* temp_sensor_get_last_temp_data(){
+	 Temp_Data_t* last = &temp_sensor->history[
+	        (temp_sensor->head_index - 1 + TEMP_HUMIDITY_SENSOR_HISTORY_SIZE) % TEMP_HUMIDITY_SENSOR_HISTORY_SIZE];
+	return last;
+}
+
+/**
+ * @brief Retrieve last n Temp_Data_t pointers from history.
+ * Result is stored in a static buffer and ordered from newest to oldest.
+ */
+
+static Temp_Data_t** temp_sensor_get_last_n_data(uint8_t n) {
+    if (!temp_sensor || n == 0 || n > temp_sensor->count) {
+        return NULL; // Invalid request
+    }
+
+    for (uint8_t i = 0; i < n; ++i) {
+        int index = (temp_sensor->head_index - 1 - i + TEMP_HUMIDITY_SENSOR_HISTORY_SIZE) % TEMP_HUMIDITY_SENSOR_HISTORY_SIZE;
+        temp_data_ptr_buffer[i] = &temp_sensor->history[index];
+    }
+
+    return temp_data_ptr_buffer;
+}
+
+
+/**
+ * @brief Retrieve last n readings from the circular buffer.
+ * Each entry in out_buffer consists of:
+ * - Bytes 0-1: temperature * 100 (2 bytes, MSB first)
+ * - Bytes 2-5: timestamp (4 bytes, MSB first)
+ */
+
+uint8_t* temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out_buffer) {
+    if (!temp_sensor || !out_buffer || n == 0 || n > temp_sensor->count) {
+        return NULL;
+    }
+
+    for (uint8_t i = 0; i < n; ++i) {
+        int index = (temp_sensor->head_index - 1 - i + TEMP_HUMIDITY_SENSOR_HISTORY_SIZE) % TEMP_HUMIDITY_SENSOR_HISTORY_SIZE;
+        Temp_Data_t* data = &temp_sensor->history[index];
+
+        // Pack: [TEMP x100 MSB, LSB], [TIMESTAMP MSB to LSB]
+        out_buffer[i * 6 + 0] = ((data->temperature*100) >> 8) & 0xFF;
+        out_buffer[i * 6 + 1] = ((data->temperature*100) >> 0) & 0xFF;
+        out_buffer[i * 6 + 2] = (data->timestamp >> 24) & 0xFF;
+        out_buffer[i * 6 + 3] = (data->timestamp >> 16) & 0xFF;
+        out_buffer[i * 6 + 4] = (data->timestamp >> 8)  & 0xFF;
+        out_buffer[i * 6 + 5] = (data->timestamp >> 0)  & 0xFF;
+    }
+
+    return out_buffer;
+}
 
 
 static void temp_prepare_i2c_request(uint8_t* payload_out) {
