@@ -18,7 +18,7 @@ static Temp_Data_t* temp_data_ptr_buffer[TEMP_HUMIDITY_SENSOR_HISTORY_SIZE];
 static void temp_format_uart_response(uint8_t* payload_out);
 static Temp_Data_t* temp_sensor_get_last_temp_data();
 static Temp_Data_t** temp_sensor_get_last_n_data(uint8_t n);
-static uint8_t* temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out);
+static uint8_t temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out);
 static void temp_prepare_i2c_request(uint8_t* payload_out);
 static void temp_decode_i2c_response(uint8_t* data, uint8_t len);
 
@@ -118,27 +118,31 @@ static Temp_Data_t** temp_sensor_get_last_n_data(uint8_t n) {
  * Each entry in out_buffer consists of:
  * - Bytes 0-1: temperature * 100 (2 bytes, MSB first)
  * - Bytes 2-5: timestamp (4 bytes, MSB first)
+ *
+ * Return the lenght of the output data
  */
 
-uint8_t* temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out_buffer) {
+uint8_t temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out_buffer) {
     if (!temp_sensor || !out_buffer || n == 0 || n > temp_sensor->count) {
         return NULL;
     }
 
-    for (uint8_t i = 0; i < n; ++i) {
+    for (uint8_t i = 0; i <= n; ++i) {
         int index = (temp_sensor->head_index - 1 - i + TEMP_HUMIDITY_SENSOR_HISTORY_SIZE) % TEMP_HUMIDITY_SENSOR_HISTORY_SIZE;
         Temp_Data_t* data = &temp_sensor->history[index];
 
-        // Pack: [TEMP x100 MSB, LSB], [TIMESTAMP MSB to LSB]
-        out_buffer[i * 6 + 0] = ((data->temperature*100) >> 8) & 0xFF;
-        out_buffer[i * 6 + 1] = ((data->temperature*100) >> 0) & 0xFF;
-        out_buffer[i * 6 + 2] = (data->timestamp >> 24) & 0xFF;
-        out_buffer[i * 6 + 3] = (data->timestamp >> 16) & 0xFF;
-        out_buffer[i * 6 + 4] = (data->timestamp >> 8)  & 0xFF;
-        out_buffer[i * 6 + 5] = (data->timestamp >> 0)  & 0xFF;
+		// Pack: [TEMP x100 MSB, LSB], [TIMESTAMP MSB to LSB]
+		out_buffer[i * 8 + 0] = ((data->temperature * 100) >> 8) & 0xFF;
+		out_buffer[i * 8 + 1] = ((data->temperature * 100) >> 0) & 0xFF;
+		out_buffer[i * 8 + 2] = 0x00;
+		out_buffer[i * 8 + 3] = 0x00;
+		out_buffer[i * 8 + 4] = (data->timestamp >> 24) & 0xFF;
+		out_buffer[i * 8 + 5] = (data->timestamp >> 16) & 0xFF;
+		out_buffer[i * 8 + 6] = (data->timestamp >> 8)  & 0xFF;
+        out_buffer[i * 8 + 7] = (data->timestamp >> 0)  & 0xFF;
     }
 
-    return out_buffer;
+    return (i*8);
 }
 
 
