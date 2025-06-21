@@ -24,7 +24,7 @@ static uint8_t rx_buffer[UART_RX_BUFFER_SIZE];
 
 // Forward declarations
 static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size);
-static void uart_handler_Send_Response(uint8_t status, uint8_t* payload, uint8_t payload_len);
+static void uart_handler_Send_Response(uint8_t cmd, uint8_t* payload, uint8_t payload_len);
 
 static uint8_t Calculate_CRC(const uint8_t *data, uint8_t length) {
     uint8_t crc = 0;
@@ -63,12 +63,12 @@ static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size) {
     data_handler_dispatcher(uart_handler->cmd_packet);
 }
 
-static void uart_handler_Send_Response(uint8_t status, uint8_t* payload, uint8_t payload_len) {
+static void uart_handler_Send_Response(uint8_t cmd, uint8_t* payload, uint8_t payload_len) {
     uint8_t* buf = tx_buffer;
     uint8_t idx = 0;
 
     buf[idx++] = 0xAA;                     // Start byte
-    buf[idx++] = status;                  // Response CMD/status
+    buf[idx++] = cmd;                  // Response CMD/status
     buf[idx++] = payload_len;             // Payload length
 
     memcpy(&buf[idx], payload, payload_len);

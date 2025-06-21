@@ -54,7 +54,7 @@ typedef struct UART_Handler {
     UART_ResponsePacket_t *resp_packet;
     UART_HandleTypeDef *huart;
     void (*process_recived_pck)(uint8_t* pck, uint16_t size);
-    void (*send_response)(UART_CommandType_t cmd, uint8_t* payload, uint8_t payload_len);
+    void (*send_response)(uint8_t cmd, uint8_t* payload, uint8_t payload_len);
     uint8_t* tx_buffer;
     uint8_t* rx_buffer;
 } UART_Handler_t;
