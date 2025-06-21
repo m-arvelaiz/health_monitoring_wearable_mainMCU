@@ -78,12 +78,13 @@ void data_handler_notify_stop_stream(void) {
 void data_handler_dispatcher(UART_CommandPacket_t* cmd) {
     data_handler->data_cmd = (Data_CmdID_t)cmd->cmd_type;
     memcpy(data_handler->payload, cmd->payload, 5);
+    data_handler->lenght=cmd->payload_len;
 
     //TODO: filter if the message is to configure something or to request a cmd
 
-    sensor_interface_handle_cmd(data_handler->data_cmd, data_handler->payload, len, data_handler->payload_out, &(data_handler->lenght_out));
+    sensor_interface_handle_cmd(data_handler->data_cmd, data_handler->payload, data_handler->lenght, data_handler->payload_out, &(data_handler->lenght_out));
     UART_Handler_t* uart = uart_handler_get();
-    uart->send_response(data_handler->data_cmd, data_handler->payload_out, data_handler->lenght_out);
+    uart->send_response(data_handler->data_cmd, data_handler->payload_out, data_handler->lenght_out );
 
 
 //    switch (data_handler->data_cmd) {

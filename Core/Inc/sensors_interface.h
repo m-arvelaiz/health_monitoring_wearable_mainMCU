@@ -7,7 +7,7 @@
 
 #ifndef INC_SENSORS_INTERFACE_H_
 #define INC_SENSORS_INTERFACE_H_
-
+#include <stdint.h>
 
 // Initializes all sensor modules (I2C setup, sensor init, etc.)
 void sensor_interface_init(void);

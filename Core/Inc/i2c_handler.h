@@ -29,7 +29,7 @@ typedef struct I2C_Handler {
 // Initialization
 void i2c_handler_init(I2C_HandleTypeDef* hi2c);
 I2C_Handler_t* i2c_handler_get(void);
-void i2c_handler_deinit(I2C_HandleTypeDef* hi2c);
+void i2c_handler_deinit();
 
 // Basic operations
 bool i2c_handler_write(uint8_t device_addr, uint8_t* data, uint8_t len);

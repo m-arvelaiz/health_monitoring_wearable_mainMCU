@@ -6,10 +6,10 @@
  */
 
 
-#include "sensor_interface.h"
+#include "sensors_interface.h"
 #include "temp_sensor.h"
 #include "i2c_handler.h"
-#include "uart_handler.h"
+#include "data_handler.h"
 #include <string.h>
 
 // Internal buffer for I2C tx/rx

@@ -33,9 +33,7 @@ void temp_sensor_init(uint8_t address) {
         temp_sensor = (Temp_Sensor_t*) malloc(sizeof(Temp_Sensor_t));
     }
 
-    if (temp_sensor == NULL) {
-            temp_data = (Temp_Sensor_t*) malloc(sizeof(Temp_Sensor_t));
-    }
+
     memset(temp_sensor, 0, sizeof(Temp_Sensor_t));
 
 	temp_sensor->i2c_address = address;
@@ -124,10 +122,11 @@ static Temp_Data_t** temp_sensor_get_last_n_data(uint8_t n) {
 
 uint8_t temp_sensor_get_last_n_temp_data_serial_format(uint8_t n, uint8_t* out_buffer) {
     if (!temp_sensor || !out_buffer || n == 0 || n > temp_sensor->count) {
-        return NULL;
+        return 0x00;
     }
 
-    for (uint8_t i = 0; i <= n; ++i) {
+    uint8_t i;
+    for (i = 0; i <= n; ++i) {
         int index = (temp_sensor->head_index - 1 - i + TEMP_HUMIDITY_SENSOR_HISTORY_SIZE) % TEMP_HUMIDITY_SENSOR_HISTORY_SIZE;
         Temp_Data_t* data = &temp_sensor->history[index];
 

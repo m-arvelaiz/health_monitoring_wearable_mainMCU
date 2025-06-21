@@ -1,0 +1,5 @@
+../Core/Src/i2c_handler.c:15:6:i2c_handler_write	6
+../Core/Src/i2c_handler.c:24:6:i2c_handler_read	6
+../Core/Src/i2c_handler.c:34:6:i2c_handler_init	2
+../Core/Src/i2c_handler.c:41:16:i2c_handler_get	1
+../Core/Src/i2c_handler.c:45:6:i2c_handler_deinit	2

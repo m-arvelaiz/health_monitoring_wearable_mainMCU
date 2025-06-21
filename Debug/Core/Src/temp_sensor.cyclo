@@ -1,0 +1,9 @@
+../Core/Src/temp_sensor.c:31:6:temp_sensor_init	2
+../Core/Src/temp_sensor.c:53:6:temp_sensor_deinit	2
+../Core/Src/temp_sensor.c:61:16:temp_sensor_get	1
+../Core/Src/temp_sensor.c:68:13:temp_format_uart_response	1
+../Core/Src/temp_sensor.c:89:14:temp_sensor_get_last_temp_data	1
+../Core/Src/temp_sensor.c:100:22:temp_sensor_get_last_n_data	5
+../Core/Src/temp_sensor.c:123:9:temp_sensor_get_last_n_temp_data_serial_format	6
+../Core/Src/temp_sensor.c:148:13:temp_prepare_i2c_request	1
+../Core/Src/temp_sensor.c:154:13:temp_decode_i2c_response	3
