@@ -22,6 +22,11 @@ void HAL_I2C_MasterTxCpltCallback (I2C_HandleTypeDef * hi2c)
 			i2c_handler->state= I2C_STATE_IDLE;
 		}else{
 			i2c_handler->state= I2C_STATE_BUSY;
+
+			if (HAL_I2C_Master_Receive_IT(i2c_handler->hi2c, i2c_handler->last_address << 1,
+						i2c_handler->Response_buffer, i2c_handler->response_buffer_lenght) != HAL_OK) {
+
+			}
 		}
 
 
@@ -54,6 +59,7 @@ bool i2c_handler_write_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len) {
 bool i2c_handler_read_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len, uint8_t len_expected) {
 
 	i2c_handler->last_address = device_addr;
+	i2c_handler->response_buffer_lenght=len_expected;
 	if (!i2c_handler || !i2c_handler->hi2c ){
 		return false;
 	}
@@ -66,14 +72,8 @@ bool i2c_handler_read_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len, uin
 	}
 	i2c_handler->state= I2C_STATE_BUSY;
 
-	if (!i2c_handler || !i2c_handler->hi2c){
-		return false;}
 
 
-	if (HAL_I2C_Master_Receive_IT(i2c_handler->hi2c, device_addr << 1,
-			i2c_handler->Response_buffer, len_expected) != HAL_OK) {
-		return false;
-	}
 	return true;
 }
 
