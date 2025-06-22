@@ -60,7 +60,7 @@ void temp_sensor_init(uint8_t address) {
 
 	if(i2c_handle->state==I2C_STATE_MSG_WAITING_FOR_PROCESSING){
 		i2c_handle->state=I2C_STATE_IDLE;
-		if (i2c_handle->Response_buffer[0] != TEMP_SENSOR_HTS221_WHO_AM_I_VAL){
+		if (i2c_handle->Response_buffer[0] = TEMP_SENSOR_HTS221_WHO_AM_I_VAL){
 			//OKK
 
 		}
