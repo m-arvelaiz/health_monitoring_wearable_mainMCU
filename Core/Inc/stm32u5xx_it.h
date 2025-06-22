@@ -56,7 +56,9 @@ void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 void I2C2_EV_IRQHandler(void);
+void I2C2_ER_IRQHandler(void);
 void UART4_IRQHandler(void);
+void TIM16_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
