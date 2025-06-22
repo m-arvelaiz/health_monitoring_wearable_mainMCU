@@ -22,7 +22,9 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "uart_handler.h"
+#include "i2c_handler.h"
 #include "data_handler.h"
+#include "sensors_interface.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -108,6 +110,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uart_handler_Init(&huart4);
   data_handler_Init();
+  i2c_handler_init(&hi2c2);
+  sensor_interface_init();
+
+  HAL_TIM_Base_Start_IT(&htim16);
 
   /* USER CODE END 2 */
 
@@ -348,9 +354,9 @@ static void MX_TIM16_Init(void)
 
   /* USER CODE END TIM16_Init 1 */
   htim16.Instance = TIM16;
-  htim16.Init.Prescaler = 0;
+  htim16.Init.Prescaler = 12800 - 1;
   htim16.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim16.Init.Period = 65535;
+  htim16.Init.Period = 49999;
   htim16.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim16.Init.RepetitionCounter = 0;
   htim16.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
@@ -434,6 +440,19 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+
+    if (htim->Instance == TIM16)
+    {
+    	HAL_TIM_Base_Stop_IT(&htim16);
+        // Your code here: runs every 5 seconds
+        //TODO: trigger meassurements
+    	HAL_TIM_Base_Start_IT(&htim16);
+    }
+
+}
 
 /* USER CODE END 4 */
 
