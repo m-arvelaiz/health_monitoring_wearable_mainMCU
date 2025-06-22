@@ -9,6 +9,17 @@
 #define INC_SENSORS_INTERFACE_H_
 #include <stdint.h>
 
+
+
+
+typedef enum {
+	TRIGGER_ENV_TEMP,
+	TRIGGER_PRESSURE,
+	TRIGGER_PPG,
+	TRIGGER_COUNT  //NOT valid state used to wrap up the schedule during the execution
+
+} sensor_interface_trigger_schedule_t;
+
 // Initializes all sensor modules (I2C setup, sensor init, etc.)
 void sensor_interface_init(void);
 

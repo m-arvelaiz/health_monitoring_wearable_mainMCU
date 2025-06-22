@@ -7,17 +7,21 @@
 
 
 #include "sensors_interface.h"
+#include "sensors_address.h"
 #include "temp_sensor.h"
 #include "i2c_handler.h"
 #include "data_handler.h"
 #include <string.h>
 
+
+//sensor_interface_trigger_schedule_t sensor_interface_trigger_schedule_state;
+sensor_interface_trigger_schedule_t sensor_interface_schedule;
+
 // Internal buffer for I2C tx/rx
-static uint8_t i2c_tx_buf[4];
-static uint8_t i2c_rx_buf[8];
 
 void sensor_interface_init(void) {
-    temp_sensor_init(TEMP_SENSOR_ADDRESS);
+	sensor_interface_schedule=TRIGGER_ENV_TEMP;
+    temp_sensor_init(SENSOR_ADDRESS_TEMP_HUM_HTS221);
     // TODO: Add other sensors
 }
 
@@ -27,19 +31,32 @@ void sensor_interface_deinit(void) {
 }
 
 void sensor_interface_schedule_readings(void) {
-    Temp_Sensor_t* temp = temp_sensor_get();
-    if (!temp) return;
 
-    // Prepare I2C payload (depends on sensor)
-    temp->prepare_i2c_request(i2c_tx_buf);
+	//STEP1:
+	//Check if a data processing is queue
+	I2C_Handler_t* i2c_handle=i2c_handler_get();
+	Temp_Sensor_t* temp = temp_sensor_get();
+	if(i2c_handle->state==I2C_STATE_MSG_WAITING_FOR_PROCESSING){
+		//current = (current + 1) % TRIGGER_COUNT;
+		i2c_handle->state=I2C_STATE_IDLE;
+		//ENV_TEMP
+		if(sensor_interface_schedule==TRIGGER_ENV_TEMP){
+			temp->decode_i2c_response(i2c_handle->Response_buffer, i2c_handle->response_buffer_lenght);
+		}
 
-    if (i2c_handler_write(temp->i2c_address, i2c_tx_buf, 1)) {
-        // Delay or wait for sensor to be ready (optional)
-        // Read back result
-        if (i2c_handler_read(temp->i2c_address, i2c_rx_buf, 4)) {
-            temp->decode_i2c_response(i2c_rx_buf, 4);
-        }
+
+		sensor_interface_schedule=(sensor_interface_schedule+1)%TRIGGER_COUNT;// schedule next reading
+	}
+
+
+	//STEP2:
+	//Schedule new reading
+    if(i2c_handle->state==I2C_STATE_IDLE){
+    	temp->trigger_data_collection();
     }
+
+
+
 }
 
 void sensor_interface_handle_cmd(uint8_t cmd_id, uint8_t* payload, uint8_t len, uint8_t* payload_out, uint8_t* len_out) {
