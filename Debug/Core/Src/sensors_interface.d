@@ -1,6 +1,7 @@
 Core/Src/sensors_interface.o: ../Core/Src/sensors_interface.c \
  ../Core/Inc/sensors_interface.h ../Core/Inc/sensors_address.h \
- ../Core/Inc/temp_sensor.h ../Core/Inc/i2c_handler.h \
+ ../Core/Inc/temp_sensor.h ../Core/Inc/pressure_sensor.h \
+ ../Core/Inc/i2c_handler.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal.h \
  ../Core/Inc/stm32u5xx_hal_conf.h \
  ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal_rcc.h \
@@ -38,6 +39,7 @@ Core/Src/sensors_interface.o: ../Core/Src/sensors_interface.c \
 ../Core/Inc/sensors_interface.h:
 ../Core/Inc/sensors_address.h:
 ../Core/Inc/temp_sensor.h:
+../Core/Inc/pressure_sensor.h:
 ../Core/Inc/i2c_handler.h:
 ../Drivers/STM32U5xx_HAL_Driver/Inc/stm32u5xx_hal.h:
 ../Core/Inc/stm32u5xx_hal_conf.h:
