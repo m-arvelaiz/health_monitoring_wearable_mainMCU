@@ -10,7 +10,7 @@
 #include <string.h>
 
 static I2C_Handler_t* i2c_handler = NULL;
-#define I2C_DELAY 100
+
 
 // Basic operations
 bool i2c_handler_write_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len);

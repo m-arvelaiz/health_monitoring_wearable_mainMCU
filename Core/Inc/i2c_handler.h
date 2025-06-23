@@ -15,6 +15,7 @@
 #include "stm32u5xx_hal.h"  // Adjust as needed for your MCU
 
 #define I2C_MAX_BUFFER_SIZE 32
+#define I2C_DELAY 500
 
 typedef enum {
 	I2C_STATE_IDLE = 0,
