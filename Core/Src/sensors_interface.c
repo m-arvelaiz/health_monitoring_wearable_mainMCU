@@ -26,7 +26,7 @@ void sensor_interface_init(void) {
 //    temp_sensor_init(SENSOR_ADDRESS_TEMP_HUM_HTS221);
     pressure_sensor_init(SENSOR_ADDRESS_PRESSURE_LPS22HH);
     ppg_sensor_init(SENSOR_ADDRESS_PPG_SEN0344);
-    // TODO: Add other sensors
+
 }
 
 void sensor_interface_deinit(void) {
