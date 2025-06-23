@@ -1,4 +1,4 @@
-../Core/Src/sensors_interface.c:23:6:sensor_interface_init	8	static
-../Core/Src/sensors_interface.c:30:6:sensor_interface_deinit	8	static
-../Core/Src/sensors_interface.c:35:6:sensor_interface_schedule_readings	24	static
-../Core/Src/sensors_interface.c:74:6:sensor_interface_handle_cmd	32	static
+../Core/Src/sensors_interface.c:24:6:sensor_interface_init	8	static
+../Core/Src/sensors_interface.c:32:6:sensor_interface_deinit	4	static
+../Core/Src/sensors_interface.c:37:6:sensor_interface_schedule_readings	24	static
+../Core/Src/sensors_interface.c:78:6:sensor_interface_handle_cmd	32	static

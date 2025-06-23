@@ -1,0 +1,12 @@
+../Core/Src/ppg_sensor.c:29:6:ppg_custom_read_command	32	static
+../Core/Src/ppg_sensor.c:43:6:ppg_sensor_init	32	static
+../Core/Src/ppg_sensor.c:79:6:ppg_sensor_deinit	8	static
+../Core/Src/ppg_sensor.c:86:15:ppg_sensor_get	4	static
+../Core/Src/ppg_sensor.c:94:13:ppg_format_uart_response	24	static
+../Core/Src/ppg_sensor.c:111:20:ppg_get_last_data	4	static
+../Core/Src/ppg_sensor.c:116:21:ppg_get_last_n_data	24	static
+../Core/Src/ppg_sensor.c:126:16:ppg_get_last_n_serial_format	32	static
+../Core/Src/ppg_sensor.c:147:9:ppg_get_last_n_bodytemp_serial_format	32	static
+../Core/Src/ppg_sensor.c:172:13:ppg_trigger_measurement	4	static
+../Core/Src/ppg_sensor.c:177:13:ppg_trigger_data_collection	16	static
+../Core/Src/ppg_sensor.c:201:13:ppg_decode_i2c_response	48	static
