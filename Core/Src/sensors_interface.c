@@ -76,7 +76,7 @@ void sensor_interface_schedule_readings(void) {
 }
 
 void sensor_interface_handle_cmd(uint8_t cmd_id, uint8_t* payload, uint8_t len, uint8_t* payload_out, uint8_t* len_out) {
-
+	PPG_Sensor_t* ppg=ppg_sensor_get();
 	switch (cmd_id) {
 	case CMD_REQ_TEMP_DATA:
 		if (payload[0] == 0x02) {
@@ -90,6 +90,13 @@ void sensor_interface_handle_cmd(uint8_t cmd_id, uint8_t* payload, uint8_t len, 
 			payload_out[0] = 0x02;
 
 			(*len_out) = pressure_get_temp_last_n_serial_format(1,
+					payload_out + 1);
+			(*len_out) = (*len_out) + 1;
+
+		} else if (payload[0] == 0x01) {
+			payload_out[0] = 0x01;
+
+			(*len_out) = ppg_get_last_n_bodytemp_serial_format(1,
 					payload_out + 1);
 			(*len_out) = (*len_out) + 1;
 
@@ -107,13 +114,12 @@ void sensor_interface_handle_cmd(uint8_t cmd_id, uint8_t* payload, uint8_t len, 
 		break;
 
 	case CMD_REQ_HR_SPO2_DATA:
-//		Pressure_Sensor_t *press = pressure_sensor_get();
-//		if (env_temp && env_temp->get_last_n_data_serial_format) {
-//			payload_out[0] = 0x00; //Reserved bit in this case not used
-//			(*len_out) = press->get_last_n_data_serial_format(1,
-//					payload_out + 1);
-//			(*len_out) = (*len_out) + 1;
-//		}
+
+
+		payload_out[0] = 0x00; //Reserved bit in this case not used
+		(*len_out) = ppg->get_last_n_data_serial_format(1, payload_out + 1);
+		(*len_out) = (*len_out) + 1;
+
 		//TODO: After finishig sensor declaration
 		break;
 

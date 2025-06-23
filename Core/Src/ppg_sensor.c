@@ -144,6 +144,31 @@ static uint8_t ppg_get_last_n_serial_format(uint8_t n, uint8_t* out) {
     return (n * 8);
 }
 
+uint8_t ppg_get_last_n_bodytemp_serial_format(uint8_t n, uint8_t* out) {
+    if (!ppg_sensor || !out || n == 0 || n > ppg_sensor->count) return 0;
+
+	uint8_t i;
+	for (i = 0; i <= n; ++i) {
+		int index = (ppg_sensor->head_index - 1 - i
+				+ PPG_SENSOR_HISTORY_SIZE)
+				% PPG_SENSOR_HISTORY_SIZE;
+		PPG_Data_t *data = &ppg_sensor->history[index];
+
+
+		// Pack: [TEMP x100 MSB, LSB], [TIMESTAMP MSB to LSB]
+		out[i * 8 + 0] = ((data->temp) >> 8) & 0xFF;
+		out[i * 8 + 1] = ((data->temp) >> 0) & 0xFF;
+		out[i * 8 + 2] = 0x00;
+		out[i * 8 + 3] = 0x00;
+		out[i * 8 + 4] = (data->timestamp >> 24) & 0xFF;
+		out[i * 8 + 5] = (data->timestamp >> 16) & 0xFF;
+		out[i * 8 + 6] = (data->timestamp >> 8) & 0xFF;
+		out[i * 8 + 7] = (data->timestamp >> 0) & 0xFF;
+	}
+
+	return (i * 8);
+}
+
 static bool ppg_trigger_measurement() {
     // NOT needed here
     return true;
@@ -157,7 +182,7 @@ static bool ppg_trigger_data_collection() {
 //		i2c->state=I2C_STATE_IDLE;
 //		return false;
 //	}
-	if (!ppg_custom_read_command(ppg_sensor->i2c_address, reg, i2c->Response_buffer, 8))
+	if (!ppg_custom_read_command(ppg_sensor->i2c_address, reg, i2c->Response_buffer, 10))
 	        return false;
 
     // TODO: Read red & IR from FIFO or sensor registers
@@ -184,7 +209,7 @@ static void ppg_decode_i2c_response(uint8_t* data, uint8_t len) {
 		       ((uint32_t)data[4] << 8) | ((uint32_t)data[5]);
 
 	float Temperature = data[8] * 1.0 + data[9] / 100.0;
-	sample.temp=(uint16_t)(Temperature*10);
+	sample.temp=(uint16_t)(Temperature*100);
 
 	sample.timestamp = 0x60D4A000; // Replace with RTC time
 

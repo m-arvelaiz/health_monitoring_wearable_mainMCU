@@ -49,6 +49,7 @@ typedef struct PPG_Sensor {
 // Initialize and release lifecycle
 void ppg_sensor_init(uint8_t address);
 void ppg_sensor_deinit(void);
+uint8_t ppg_get_last_n_bodytemp_serial_format(uint8_t n, uint8_t* out);
 
 // Accessor
 PPG_Sensor_t* ppg_sensor_get(void);
