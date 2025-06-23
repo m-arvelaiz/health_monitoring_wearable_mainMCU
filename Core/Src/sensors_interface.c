@@ -99,7 +99,7 @@ void sensor_interface_handle_cmd(uint8_t cmd_id, uint8_t* payload, uint8_t len, 
 
 	case CMD_REQ_PRESSURE_DATA:
 		Pressure_Sensor_t *press = pressure_sensor_get();
-		if (env_temp && env_temp->get_last_n_data_serial_format) {
+		if (press && press->get_last_n_data_serial_format) {
 			payload_out[0] = 0x00; //Reserved bit in this case not used
 			(*len_out) = press->get_last_n_data_serial_format(1, payload_out + 1);
 			(*len_out) = (*len_out) + 1;
