@@ -448,6 +448,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     {
     	HAL_TIM_Base_Stop_IT(&htim16);
         // Your code here: runs every 5 seconds
+    	sensor_interface_schedule_readings();
         //TODO: trigger meassurements
     	HAL_TIM_Base_Start_IT(&htim16);
     }
