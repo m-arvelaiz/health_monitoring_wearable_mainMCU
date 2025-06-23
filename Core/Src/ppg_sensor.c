@@ -25,6 +25,21 @@ static bool ppg_trigger_measurement();
 static bool ppg_trigger_data_collection();
 
 
+
+bool ppg_custom_read_command(uint8_t device_addr, uint8_t cmd, uint8_t* out, uint8_t len) {
+	I2C_Handler_t* i2c_handler = i2c_handler_get();
+	// 1) send the “get HR/SpO2” command
+    if (HAL_I2C_Master_Transmit(i2c_handler->hi2c, device_addr << 1, &cmd, 1, I2C_DELAY) != HAL_OK) {
+        return false;
+    }
+    // 2) then read back len bytes
+    if (HAL_I2C_Master_Receive(i2c_handler->hi2c, device_addr << 1, out, len, I2C_DELAY) != HAL_OK) {
+        return false;
+    }
+    return true;
+}
+
+
 void ppg_sensor_init(uint8_t address) {
     ppg_sensor = (PPG_Sensor_t*) malloc(sizeof(PPG_Sensor_t));
     memset(ppg_sensor, 0, sizeof(PPG_Sensor_t));
@@ -51,9 +66,13 @@ void ppg_sensor_init(uint8_t address) {
     // i2c_handler_write_reg(address, init_cmd, 2);
     I2C_Handler_t* i2c = i2c_handler_get();
     uint8_t ctrl1[3] = { PPG_SENSOR_SEN0344_START_STOP, 0x00,0x01 };
-    if (!i2c->write_reg(ppg_sensor->i2c_address, ctrl1, 3)){
-    	return;
-    }
+//	if (!i2c->write_reg(ppg_sensor->i2c_address, ctrl1, 3)) {
+//		return;
+//	}
+
+    if (HAL_I2C_Master_Transmit(i2c->hi2c, address << 1, ctrl1, 3, I2C_DELAY) != HAL_OK) {
+            return false;
+        }
     HAL_Delay(5);
 }
 
@@ -134,9 +153,12 @@ static bool ppg_trigger_data_collection() {
 	I2C_Handler_t *i2c = i2c_handler_get();
 
 	uint8_t reg = PPG_SENSOR_SEN0344_HR_SPO2;
-	if (!i2c->read_reg(ppg_sensor->i2c_address, &reg, 1, 8)) {
-		return false;
-	}
+//	if (!i2c->read_reg(ppg_sensor->i2c_address, &reg, 1, 8)) {
+//		i2c->state=I2C_STATE_IDLE;
+//		return false;
+//	}
+	if (!ppg_custom_read_command(ppg_sensor->i2c_address, reg, i2c->Response_buffer, 8))
+	        return false;
 
     // TODO: Read red & IR from FIFO or sensor registers
     // Example (pseudo):
