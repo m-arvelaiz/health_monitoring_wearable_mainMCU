@@ -199,10 +199,10 @@ static bool pressure_trigger_data_collection() {
     reg = PRESSURE_SENSOR_LPS22HH_PRESS_OUT_XL;// auto-increment
     if (!i2c->read_reg(pressure_sensor->i2c_address, &reg, 1, 5)) return false;
 
-    pressure_sensor->decode_i2c_response(i2c->Response_buffer, 3);
+    pressure_sensor->decode_i2c_response(i2c->Response_buffer, 5);
 
 
-    return false;
+    return true;
 }
 
 static void pressure_decode_i2c_response(uint8_t* data, uint8_t len) {
