@@ -10,6 +10,7 @@
 #include <string.h>
 
 static I2C_Handler_t* i2c_handler = NULL;
+#define I2C_DELAY 100
 
 // Basic operations
 bool i2c_handler_write_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len);
@@ -33,6 +34,14 @@ void HAL_I2C_MasterTxCpltCallback (I2C_HandleTypeDef * hi2c)
 	}
 }
 
+void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c){
+
+}
+
+void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c){
+
+}
+
 void HAL_I2C_MasterRxCpltCallback (I2C_HandleTypeDef * hi2c)
  {
 	if (i2c_handler->hi2c == hi2c) {
@@ -42,18 +51,24 @@ void HAL_I2C_MasterRxCpltCallback (I2C_HandleTypeDef * hi2c)
 
 
 bool i2c_handler_write_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len) {
-	i2c_handler->last_address=device_addr;
+	i2c_handler->last_address = device_addr;
 
-    if (!i2c_handler || !i2c_handler->hi2c ) return false;
+	if (!i2c_handler || !i2c_handler->hi2c)
+		return false;
 
-    i2c_handler->state= I2C_STATE_BUSY;
-    i2c_handler->operation_type= I2C_OP_TYPE_WRITE_REG;
+	i2c_handler->state = I2C_STATE_BUSY;
+	i2c_handler->operation_type = I2C_OP_TYPE_WRITE_REG;
 
     if (HAL_I2C_Master_Transmit_IT(i2c_handler->hi2c, device_addr << 1, buffer, len) != HAL_OK) {
         return false;
     }
-    i2c_handler->state= I2C_STATE_IDLE;
-    return true;
+//	if (HAL_I2C_Master_Transmit(i2c_handler->hi2c, device_addr << 1, buffer,
+//			len, I2C_DELAY) != HAL_OK) {
+//		return false;
+//	}
+
+	i2c_handler->state = I2C_STATE_IDLE;
+	return true;
 }
 
 bool i2c_handler_read_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len, uint8_t len_expected) {
@@ -66,12 +81,39 @@ bool i2c_handler_read_reg(uint8_t device_addr, uint8_t* buffer, uint8_t len, uin
 	i2c_handler->state= I2C_STATE_BUSY;
 	i2c_handler->operation_type= I2C_OP_TYPE_READ_REG;
 
-	if (HAL_I2C_Master_Transmit_IT(i2c_handler->hi2c, device_addr << 1,
-			buffer, len) != HAL_OK) {
-		return false;
-	}
-	i2c_handler->state= I2C_STATE_BUSY;
 
+//VERSION1
+//	if (HAL_I2C_Master_Transmit_IT(i2c_handler->hi2c, device_addr << 1,
+//			buffer, len) != HAL_OK) {
+//		return false;
+//	}
+// 	i2c_handler->state= I2C_STATE_BUSY;
+
+//VERSION2
+
+//	// Transmit register address
+//	if (HAL_I2C_Master_Transmit(i2c_handler->hi2c, device_addr << 1, buffer,
+//			len, I2C_DELAY) != HAL_OK) {
+//		return false;
+//	}
+////
+//	// Immediately follow with read
+//	if (HAL_I2C_Master_Receive(i2c_handler->hi2c, device_addr << 1,
+//			i2c_handler->Response_buffer, len_expected, I2C_DELAY) != HAL_OK) {
+//		return false;
+//	}
+
+
+	if (HAL_I2C_Mem_Read(i2c_handler->hi2c,
+		                     device_addr << 1,
+		                     *buffer,
+		                     I2C_MEMADD_SIZE_8BIT,
+		                     i2c_handler->Response_buffer,
+		                     len_expected,
+		                     I2C_DELAY) != HAL_OK) {
+			return false;
+		}
+	i2c_handler->state= I2C_STATE_IDLE;
 
 
 	return true;
