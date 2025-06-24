@@ -45,7 +45,7 @@ static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size) {
     if (size < 7) return;
 
     uint8_t received_crc = pck[size - 1];
-    uint8_t calculated_crc = Calculate_CRC(&pck[1], size - 2); // exclude start byte and CRC
+    uint8_t calculated_crc = Calculate_CRC(&pck[0], size - 1); // exclude start byte and CRC
     if (received_crc != calculated_crc) {
         uart_handler->state = UART_STATE_ERROR;
         return;
@@ -54,7 +54,7 @@ static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size) {
     uart_handler->cmd_packet->header = pck[0];
     uart_handler->cmd_packet->cmd_type = pck[1];
     uart_handler->cmd_packet->payload_len = pck[2];
-    memcpy(uart_handler->cmd_packet->payload, &pck[3], 4);
+    memcpy(uart_handler->cmd_packet->payload, &pck[3], 5);
     uart_handler->cmd_packet->crc = received_crc;
 
     uart_handler->state = UART_STATE_PROCESSING;

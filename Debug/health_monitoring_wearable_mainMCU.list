@@ -33,15 +33,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  14 .debug_macro  0003781d  00000000  00000000  00039f29  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_line   000268bd  00000000  00000000  00071746  2**0
+ 15 .debug_line   000268ba  00000000  00000000  00071746  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_str    00159b89  00000000  00000000  00098003  2**0
+ 16 .debug_str    00159b89  00000000  00000000  00098000  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .comment      00000043  00000000  00000000  001f1b8c  2**0
+ 17 .comment      00000043  00000000  00000000  001f1b89  2**0
                   CONTENTS, READONLY
- 18 .debug_frame  00008584  00000000  00000000  001f1bd0  2**2
+ 18 .debug_frame  00008584  00000000  00000000  001f1bcc  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_line_str 0000008e  00000000  00000000  001fa154  2**0
+ 19 .debug_line_str 0000008e  00000000  00000000  001fa150  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -5775,62 +5775,61 @@ static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size) {
  8002acc:	4413      	add	r3, r2
  8002ace:	781b      	ldrb	r3, [r3, #0]
  8002ad0:	73fb      	strb	r3, [r7, #15]
-    uint8_t calculated_crc = Calculate_CRC(&pck[1], size - 2); // exclude start byte and CRC
- 8002ad2:	687b      	ldr	r3, [r7, #4]
- 8002ad4:	1c5a      	adds	r2, r3, #1
- 8002ad6:	887b      	ldrh	r3, [r7, #2]
+    uint8_t calculated_crc = Calculate_CRC(&pck[0], size - 1); // exclude start byte and CRC
+ 8002ad2:	887b      	ldrh	r3, [r7, #2]
+ 8002ad4:	b2db      	uxtb	r3, r3
+ 8002ad6:	3b01      	subs	r3, #1
  8002ad8:	b2db      	uxtb	r3, r3
- 8002ada:	3b02      	subs	r3, #2
- 8002adc:	b2db      	uxtb	r3, r3
- 8002ade:	4619      	mov	r1, r3
- 8002ae0:	4610      	mov	r0, r2
- 8002ae2:	f7ff ffa3 	bl	8002a2c <Calculate_CRC>
- 8002ae6:	4603      	mov	r3, r0
- 8002ae8:	73bb      	strb	r3, [r7, #14]
+ 8002ada:	4619      	mov	r1, r3
+ 8002adc:	6878      	ldr	r0, [r7, #4]
+ 8002ade:	f7ff ffa5 	bl	8002a2c <Calculate_CRC>
+ 8002ae2:	4603      	mov	r3, r0
+ 8002ae4:	73bb      	strb	r3, [r7, #14]
     if (received_crc != calculated_crc) {
- 8002aea:	7bfa      	ldrb	r2, [r7, #15]
- 8002aec:	7bbb      	ldrb	r3, [r7, #14]
- 8002aee:	429a      	cmp	r2, r3
- 8002af0:	d004      	beq.n	8002afc <uart_handler_Process_Received_pck+0x48>
+ 8002ae6:	7bfa      	ldrb	r2, [r7, #15]
+ 8002ae8:	7bbb      	ldrb	r3, [r7, #14]
+ 8002aea:	429a      	cmp	r2, r3
+ 8002aec:	d004      	beq.n	8002af8 <uart_handler_Process_Received_pck+0x44>
         uart_handler->state = UART_STATE_ERROR;
- 8002af2:	4b1a      	ldr	r3, [pc, #104]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
- 8002af4:	681b      	ldr	r3, [r3, #0]
- 8002af6:	2203      	movs	r2, #3
- 8002af8:	701a      	strb	r2, [r3, #0]
+ 8002aee:	4b1b      	ldr	r3, [pc, #108]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
+ 8002af0:	681b      	ldr	r3, [r3, #0]
+ 8002af2:	2203      	movs	r2, #3
+ 8002af4:	701a      	strb	r2, [r3, #0]
         return;
- 8002afa:	e02b      	b.n	8002b54 <uart_handler_Process_Received_pck+0xa0>
+ 8002af6:	e02d      	b.n	8002b54 <uart_handler_Process_Received_pck+0xa0>
     }
 
     uart_handler->cmd_packet->header = pck[0];
- 8002afc:	4b17      	ldr	r3, [pc, #92]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
- 8002afe:	681b      	ldr	r3, [r3, #0]
- 8002b00:	685b      	ldr	r3, [r3, #4]
- 8002b02:	687a      	ldr	r2, [r7, #4]
- 8002b04:	7812      	ldrb	r2, [r2, #0]
- 8002b06:	701a      	strb	r2, [r3, #0]
+ 8002af8:	4b18      	ldr	r3, [pc, #96]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
+ 8002afa:	681b      	ldr	r3, [r3, #0]
+ 8002afc:	685b      	ldr	r3, [r3, #4]
+ 8002afe:	687a      	ldr	r2, [r7, #4]
+ 8002b00:	7812      	ldrb	r2, [r2, #0]
+ 8002b02:	701a      	strb	r2, [r3, #0]
     uart_handler->cmd_packet->cmd_type = pck[1];
- 8002b08:	4b14      	ldr	r3, [pc, #80]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
- 8002b0a:	681b      	ldr	r3, [r3, #0]
- 8002b0c:	685b      	ldr	r3, [r3, #4]
- 8002b0e:	687a      	ldr	r2, [r7, #4]
- 8002b10:	7852      	ldrb	r2, [r2, #1]
- 8002b12:	705a      	strb	r2, [r3, #1]
+ 8002b04:	4b15      	ldr	r3, [pc, #84]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
+ 8002b06:	681b      	ldr	r3, [r3, #0]
+ 8002b08:	685b      	ldr	r3, [r3, #4]
+ 8002b0a:	687a      	ldr	r2, [r7, #4]
+ 8002b0c:	7852      	ldrb	r2, [r2, #1]
+ 8002b0e:	705a      	strb	r2, [r3, #1]
     uart_handler->cmd_packet->payload_len = pck[2];
- 8002b14:	4b11      	ldr	r3, [pc, #68]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
- 8002b16:	681b      	ldr	r3, [r3, #0]
- 8002b18:	685b      	ldr	r3, [r3, #4]
- 8002b1a:	687a      	ldr	r2, [r7, #4]
- 8002b1c:	7892      	ldrb	r2, [r2, #2]
- 8002b1e:	709a      	strb	r2, [r3, #2]
-    memcpy(uart_handler->cmd_packet->payload, &pck[3], 4);
- 8002b20:	4b0e      	ldr	r3, [pc, #56]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
- 8002b22:	681b      	ldr	r3, [r3, #0]
- 8002b24:	685b      	ldr	r3, [r3, #4]
+ 8002b10:	4b12      	ldr	r3, [pc, #72]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
+ 8002b12:	681b      	ldr	r3, [r3, #0]
+ 8002b14:	685b      	ldr	r3, [r3, #4]
+ 8002b16:	687a      	ldr	r2, [r7, #4]
+ 8002b18:	7892      	ldrb	r2, [r2, #2]
+ 8002b1a:	709a      	strb	r2, [r3, #2]
+    memcpy(uart_handler->cmd_packet->payload, &pck[3], 5);
+ 8002b1c:	4b0f      	ldr	r3, [pc, #60]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
+ 8002b1e:	681b      	ldr	r3, [r3, #0]
+ 8002b20:	685b      	ldr	r3, [r3, #4]
+ 8002b22:	1cd8      	adds	r0, r3, #3
+ 8002b24:	687b      	ldr	r3, [r7, #4]
  8002b26:	3303      	adds	r3, #3
- 8002b28:	687a      	ldr	r2, [r7, #4]
- 8002b2a:	3203      	adds	r2, #3
- 8002b2c:	6812      	ldr	r2, [r2, #0]
- 8002b2e:	601a      	str	r2, [r3, #0]
+ 8002b28:	2205      	movs	r2, #5
+ 8002b2a:	4619      	mov	r1, r3
+ 8002b2c:	f00a f990 	bl	800ce50 <memcpy>
     uart_handler->cmd_packet->crc = received_crc;
  8002b30:	4b0a      	ldr	r3, [pc, #40]	@ (8002b5c <uart_handler_Process_Received_pck+0xa8>)
  8002b32:	681b      	ldr	r3, [r3, #0]
