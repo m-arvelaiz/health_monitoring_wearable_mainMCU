@@ -130,15 +130,15 @@ static uint8_t ppg_get_last_n_serial_format(uint8_t n, uint8_t* out) {
         int index = (ppg_sensor->head_index - 1 - i + PPG_SENSOR_HISTORY_SIZE) % PPG_SENSOR_HISTORY_SIZE;
         PPG_Data_t* data = &ppg_sensor->history[index];
 
-        out[i * 10 + 0] = (data->hr >> 8) & 0xFF;
-        out[i * 10 + 1] = (data->hr >> 0)  & 0xFF;
-        out[i * 10 + 4] = (data->spo2 >> 8)  & 0xFF;
-        out[i * 10 + 5] = (data->spo2 >> 0)  & 0xFF;
+        out[i * 8 + 0] = (data->hr >> 8) & 0xFF;
+        out[i * 8 + 1] = (data->hr >> 0)  & 0xFF;
+        out[i * 8 + 2] = (data->spo2 >> 8)  & 0xFF;
+        out[i * 8 + 3] = (data->spo2 >> 0)  & 0xFF;
 
-        out[i * 10 + 6] = (data->timestamp >> 24) & 0xFF;
-        out[i * 10 + 7] = (data->timestamp >> 16) & 0xFF;
-        out[i * 10 + 8] = (data->timestamp >> 8)  & 0xFF;
-        out[i * 10 + 9] = (data->timestamp >> 0)  & 0xFF;
+        out[i * 8 + 4] = (data->timestamp >> 24) & 0xFF;
+        out[i * 8 + 5] = (data->timestamp >> 16) & 0xFF;
+        out[i * 8 + 6] = (data->timestamp >> 8)  & 0xFF;
+        out[i * 8 + 7] = (data->timestamp >> 0)  & 0xFF;
     }
 
     return (n * 8);
@@ -148,7 +148,7 @@ uint8_t ppg_get_last_n_bodytemp_serial_format(uint8_t n, uint8_t* out) {
     if (!ppg_sensor || !out || n == 0 || n > ppg_sensor->count) return 0;
 
 	uint8_t i;
-	for (i = 0; i <= n; ++i) {
+	for (i = 0; i < n; ++i) {
 		int index = (ppg_sensor->head_index - 1 - i
 				+ PPG_SENSOR_HISTORY_SIZE)
 				% PPG_SENSOR_HISTORY_SIZE;
@@ -156,8 +156,8 @@ uint8_t ppg_get_last_n_bodytemp_serial_format(uint8_t n, uint8_t* out) {
 
 
 		// Pack: [TEMP x100 MSB, LSB], [TIMESTAMP MSB to LSB]
-		out[i * 8 + 0] = ((data->temp) >> 8) & 0xFF;
-		out[i * 8 + 1] = ((data->temp) >> 0) & 0xFF;
+		out[i * 8 + 0] = (data->temp >> 8) & 0xFF;
+		out[i * 8 + 1] = (data->temp >> 0) & 0xFF;
 		out[i * 8 + 2] = 0x00;
 		out[i * 8 + 3] = 0x00;
 		out[i * 8 + 4] = (data->timestamp >> 24) & 0xFF;
