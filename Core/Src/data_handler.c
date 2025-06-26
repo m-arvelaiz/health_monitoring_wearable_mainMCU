@@ -80,6 +80,11 @@ void data_handler_dispatcher(UART_CommandPacket_t* cmd) {
     memcpy(data_handler->payload, cmd->payload, 5);
     data_handler->lenght=cmd->payload_len;
 
+    //Clean from past cmds response
+    memset(data_handler->payload_out, 0, data_handler->lenght_out);
+    data_handler->lenght_out=0;
+
+
     //TODO: filter if the message is to configure something or to request a cmd
 
     sensor_interface_handle_cmd(data_handler->data_cmd, data_handler->payload, data_handler->lenght, data_handler->payload_out, &(data_handler->lenght_out));
@@ -87,44 +92,6 @@ void data_handler_dispatcher(UART_CommandPacket_t* cmd) {
     uart->send_response(data_handler->data_cmd, data_handler->payload_out, data_handler->lenght_out );
 
 
-//    switch (data_handler->data_cmd) {
-//        case CMD_REQ_HR_SPO2_DATA:
-//            data_handler_req_hr_spo2();
-//            break;
-//        case CMD_REQ_TEMP_DATA:
-//            data_handler_req_temp(cmd->payload[0]);
-//            break;
-//        case CMD_REQ_PRESSURE_DATA:
-//            data_handler_req_pressure();
-//            break;
-//        case CMD_REQ_ALL_DATA:
-//            data_handler_req_all_data();
-//            break;
-//        case CMD_REQ_HISTORICAL_DATA: {
-//            uint32_t ts = (cmd->payload[0] << 24) | (cmd->payload[1] << 16) |
-//                          (cmd->payload[2] << 8) | cmd->payload[3];
-//            data_handler_req_historical_data(ts);
-//            break;
-//        }
-//        case CMD_SET_UNIX_TIME: {
-//            uint32_t unix_time = (cmd->payload[0] << 24) | (cmd->payload[1] << 16) |
-//                                 (cmd->payload[2] << 8) | cmd->payload[3];
-//            data_handler_req_set_unix_time(unix_time);
-//            break;
-//        }
-//        case CMD_SET_SENSOR_CONFIG:
-//            data_handler_req_set_sensor_config(cmd->payload[0], cmd->payload[1]);
-//            break;
-//        case CMD_START_STREAM:
-//            data_handler_req_start_stream(cmd->payload[0]);
-//            break;
-//        case CMD_STOP_STREAM:
-//            data_handler_req_stop_stream();
-//            break;
-//        default:
-//            // Unknown command handling
-//            break;
-//    }
 }
 
 //static void data_handler_req_hr_spo2(void) {
@@ -176,6 +143,7 @@ void data_handler_Init(void) {
     data_handler = (Data_Handler_t *)malloc(sizeof(Data_Handler_t));
     data_handler->payload = data_handler_buffer;
     data_handler->payload_out = data_handler_buffer_out;
+    data_handler->lenght_out=0;
     memset(data_handler->payload, 0, DATA_HANDLER_PAYLOAD_LENGHT);
     memset(data_handler->payload_out, 0, DATA_HANDLER_PAYLOAD_LENGHT);
 }

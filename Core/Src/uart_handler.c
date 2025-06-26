@@ -36,7 +36,9 @@ static uint8_t Calculate_CRC(const uint8_t *data, uint8_t length) {
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     if (Size >= 7 && rx_buffer[0] == 0xAA) {
-        uart_handler->process_recived_pck(rx_buffer, Size);
+    	uart_handler->state=UART_STATE_WAITING_PROCESSING;
+    	uart_handler->rx_buffer_len=Size;
+//		uart_handler->process_recived_pck(uart_handler->rx_buffer, uart_handler->rx_buffer_len);
     }
     HAL_UARTEx_ReceiveToIdle_IT(uart_handler->huart, rx_buffer, UART_RX_BUFFER_SIZE);
 }
@@ -58,8 +60,8 @@ static void uart_handler_Process_Received_pck(uint8_t* pck, uint16_t size) {
     uart_handler->cmd_packet->crc = received_crc;
 
     uart_handler->state = UART_STATE_PROCESSING;
-
-    // Here you should now call your command dispatcher logic:
+//
+//    // Here you should now call your command dispatcher logic:
     data_handler_dispatcher(uart_handler->cmd_packet);
 }
 
@@ -80,6 +82,7 @@ static void uart_handler_Send_Response(uint8_t cmd, uint8_t* payload, uint8_t pa
 
     HAL_UART_Transmit(uart_handler->huart, buf, idx, HAL_MAX_DELAY);
     uart_handler->state = UART_STATE_IDLE;
+
 }
 
 void uart_handler_Init(UART_HandleTypeDef *huart) {
@@ -92,6 +95,7 @@ void uart_handler_Init(UART_HandleTypeDef *huart) {
     uart_handler->max_payload_len = UART_RX_BUFFER_SIZE - 6;
     uart_handler->rx_buffer = rx_buffer;
     uart_handler->tx_buffer = tx_buffer;
+    uart_handler->rx_buffer_len=0;
 
     uart_handler->process_recived_pck = uart_handler_Process_Received_pck;
     uart_handler->send_response = uart_handler_Send_Response;
@@ -118,4 +122,13 @@ void uart_handler_Reset_State(void) {
 
 UART_Handler_t* uart_handler_get(void) {
     return uart_handler;
+}
+
+void uart_handler_check_tx_buffer(void){
+	if(uart_handler->state==UART_STATE_WAITING_PROCESSING){
+		uart_handler->process_recived_pck(uart_handler->rx_buffer, uart_handler->rx_buffer_len);
+
+		uart_handler->state=UART_STATE_IDLE;
+	}
+
 }

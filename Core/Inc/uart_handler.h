@@ -18,8 +18,8 @@
 
 typedef enum {
     UART_STATE_IDLE = 0,
-    UART_STATE_WAITING_RESPONSE,
-    UART_STATE_PROCESSING,
+    UART_STATE_WAITING_PROCESSING,
+	UART_STATE_PROCESSING,
     UART_STATE_ERROR
 } UART_State_t;
 
@@ -57,6 +57,7 @@ typedef struct UART_Handler {
     void (*send_response)(uint8_t cmd, uint8_t* payload, uint8_t payload_len);
     uint8_t* tx_buffer;
     uint8_t* rx_buffer;
+    uint8_t rx_buffer_len;
 } UART_Handler_t;
 
 // Public interface
@@ -64,6 +65,7 @@ void uart_handler_Init(UART_HandleTypeDef *huart);
 void uart_handler_DeInit(void);
 void uart_handler_Reset_State(void);
 UART_Handler_t* uart_handler_get(void);
+void uart_handler_check_tx_buffer(void);
 
 
 #endif /* INC_UART_HANDLER_H_ */

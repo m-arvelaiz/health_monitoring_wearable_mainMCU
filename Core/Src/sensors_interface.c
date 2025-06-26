@@ -93,7 +93,7 @@ void sensor_interface_handle_cmd(uint8_t cmd_id, uint8_t* payload, uint8_t len, 
 					payload_out + 1);
 			(*len_out) = (*len_out) + 1;
 
-		} else if (payload[0] == 0x01) {
+		}		else if (payload[0] == 0x01) {
 			payload_out[0] = 0x01;
 
 			(*len_out) = ppg_get_last_n_bodytemp_serial_format(1,
